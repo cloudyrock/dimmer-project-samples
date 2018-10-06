@@ -13,7 +13,7 @@
 
     <properties>
         <slf4j.version>1.7.25</slf4j.version>
-        <dimmerVersion>2.2.1-SNAPSHOT</dimmerVersion>
+        <dimmerVersion>2.2.2</dimmerVersion>
     </properties>
 
     <dependencies>
