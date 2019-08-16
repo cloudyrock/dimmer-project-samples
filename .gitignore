@@ -73,6 +73,8 @@ crashlytics-build.properties
 # Created by .ignore support plugin (hsz.mobi)
 
 target
+build
+.gradle
 
 .vagrant/
 Vagrantfile
