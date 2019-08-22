@@ -5,18 +5,24 @@ buildscript {
     }
 }
 
-
 plugins {
     id 'java'
-    id 'maven-publish'
 }
 
 ext {
     aspectjVersion = '1.8.2'
+    dimmerVersion = '2.2.2'
 }
 
+configurations {
+    ajc
+    aspects
+    compile {
+        extendsFrom aspects
+    }
+}
 
-group = 'com.github.cloudyrock.dimmer'
+group = 'com.github.cloudyrock.dimmer.examples.standalone'
 version = '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 
@@ -28,16 +34,8 @@ repositories {
     }
 }
 
-configurations {
-    ajc
-    aspects
-    compile {
-        extendsFrom aspects
-    }
-}
-
 dependencies {
-    compile 'com.github.cloudyrock.dimmer:dimmer-local:2.2.2'
+    compile "com.github.cloudyrock.dimmer:dimmer-local:$dimmerVersion"
 
     compile "org.aspectj:aspectjrt:$aspectjVersion"
     compile "org.aspectj:aspectjweaver:$aspectjVersion"
@@ -47,12 +45,6 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
-//
-//task sourcesJar(type: Jar) {
-//    classifier = 'sources'
-//    from(sourceSets.main.allJava)
-//}
-
 def aspectj = { destDir, aspectPath, inpath, classpath ->
     ant.taskdef(resource: "org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties",
             classpath: configurations.ajc.asPath)
@@ -60,7 +52,7 @@ def aspectj = { destDir, aspectPath, inpath, classpath ->
     ant.iajc(
             maxmem: "1024m", fork: "true", Xlint: "ignore",
             destDir: destDir,
-            aspectPath: aspectPath,
+            aspectPath: '/Users/dhsadhwani/.m2/repository/com/github/cloudyrock/dimmer/dimmer-local/'+"$dimmerVersion"+'/dimmer-local-'+"$dimmerVersion" +'.jar',
             inpath: inpath,
             classpath: classpath,
             source: project.sourceCompatibility,
@@ -70,9 +62,6 @@ def aspectj = { destDir, aspectPath, inpath, classpath ->
 
 compileJava {
     doLast {
-        println("Trying to sort this out")
-        println(project.sourceSets.main.output.classesDirs)
-        println(project.sourceSets.main.java.outputDir)
         aspectj project.sourceSets.main.java.outputDir,
                 configurations.aspects.asPath,
                 project.sourceSets.main.java.outputDir,
@@ -85,18 +74,8 @@ compileTestJava {
 
     doLast {
         aspectj project.sourceSets.test.java.outputDir,
-                configurations.aspects.asPath + jar.archivePath,
+                configurations.aspects.asPath,
                 project.sourceSets.test.java.outputDir,
                 project.sourceSets.test.runtimeClasspath.asPath
     }
 }
-
-//
-//publishing {
-//    publications {
-//        maven(MavenPublication) {
-//            from(components.java)
-//            artifact(sourcesJar)
-//        }
-//    }
-//}
